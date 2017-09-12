@@ -56,12 +56,36 @@ bigPosInteger::bigPosInteger(int value)
 bigPosInteger::bigPosInteger(const bigPosInteger& value)
 /*This is a copy constructor, be EXTREMELY careful for memory leaks here*/
 {
+    //Since Length is not a pointer, we shallow copy the content to length.
+    length = value.length;
+
+    //IF statement to check and see if the object value has data"numbers"
+    if(value.valueArray)
+    {
+        //If there are numbers in value object, we create a new block memory to save it
+        valueArray = new int[length];
+
+        //for loop to copy the content of value object to the new object "Deep Copy"
+        for(int i=0; i<=length;i++)
+        {
+            valueArray[i]= value.valueArray[i];
+        }
+
+    }
+    //If value is empty, the valueArray object will be donated as zero
+    else{
+
+        valueArray = 0;
+    }
+
 
 }
 
 bigPosInteger::~bigPosInteger()
 /*This is the destructor, be extremely careful for memory leaks here*/
 {
+
+
 }
 
 bigPosInteger bigPosInteger::operator+ (const bigPosInteger& rhs)
