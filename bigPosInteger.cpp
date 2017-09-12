@@ -66,7 +66,7 @@ bigPosInteger::bigPosInteger(const bigPosInteger& value)
         valueArray = new int[length];
 
         //for loop to copy the content of value object to the new object "Deep Copy"
-        for(int i=0; i<=length;i++)
+        for(int i=0; i<length;++i)
         {
             valueArray[i]= value.valueArray[i];
         }
@@ -84,14 +84,65 @@ bigPosInteger::bigPosInteger(const bigPosInteger& value)
 bigPosInteger::~bigPosInteger()
 /*This is the destructor, be extremely careful for memory leaks here*/
 {
-
+    delete []valueArray;
 
 }
 
 bigPosInteger bigPosInteger::operator+ (const bigPosInteger& rhs)
 /*this operator should be able to add two bigPosInteger together and return the result. The default return should be replaced with the appropriate variable*/
 {
-    return bigPosInteger(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char>>());
+    //create a new object to save the result
+    bigPosInteger result;
+    long long temp;
+    long long size;
+    int carry;
+
+    //Compare the sizes of the two operand using if statement
+    if(this->length>rhs.length)
+    {
+        //if "this" is greater than rhs, it becomes the primary operand and the new object size will be set size of this object +1 for the carry
+        result.length = this->length+1;
+        //loop through the values and add
+        for(size = result.length; size>=0; size--)
+        {
+            //create a temp memory to hold the value
+            temp = this->valueArray[size]+rhs.valueArray[size]+carry;
+
+            //check to see if the addition produce a carry
+            if(temp>=10)
+            {
+                temp = temp %10;
+                carry = 1;
+                result.valueArray[size] = temp;
+            }
+            else{
+                result.valueArray[size] = temp;
+                carry = 0;
+            }
+        }
+
+    }
+    else {
+        //Repeat the above process but we are setting the length to rhs.length
+        result.length = rhs.length;
+        for(size = result.length; size>=0; size--)
+        {
+            temp = rhs.valueArray[size]+rhs.valueArray[size]+carry;
+        }
+        if(temp>=10)
+        {
+            temp = temp %10;
+            carry = 1;
+            result.valueArray[size] = temp;
+        }
+
+        else{
+            result.valueArray[size]=temp;
+            carry = 0;
+        }
+
+    }
+    return result;
 }
 
 bigPosInteger bigPosInteger::operator- (const bigPosInteger& rhs)
@@ -109,7 +160,39 @@ bigPosInteger bigPosInteger::operator*(const bigPosInteger& rhs)
 bigPosInteger &bigPosInteger::operator=(const bigPosInteger& rhs)
 /* this is the copy assignment operator, be EXTREMELY careful for memory leaks here. The default return should be replaced with the appropriate variable*/
 {
-    return <#initializer#>;
+    //checking to see if the rhs object is not the same as the "this" object
+    if(this == &rhs)
+    {
+        return *this;
+    }
+
+    //delete any memory that this object is holding so we can copy the data from rhs
+    delete[]valueArray;
+
+
+    //shallow copy the length
+    length = rhs.length;
+
+    //deep copying the values to "this" object
+    if(rhs.valueArray) {
+        //create a new block memory to copy the data (integers)
+        valueArray = new int[length];
+
+        //Deep copy the values
+        for (int i = 0; i < length; ++i) {
+            valueArray[i] = rhs.valueArray[i];
+        }
+
+
+    }
+
+    //if there are no values assign this value array to zero
+    else {
+        valueArray = 0;
+    }
+    //Since it is referenced object we return it using pointer "*this"
+    return *this;
+
 }
 
 std::ostream &operator<<(std::ostream & stream, const bigPosInteger& rhs)
