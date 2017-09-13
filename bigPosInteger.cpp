@@ -202,8 +202,50 @@ bigPosInteger bigPosInteger::operator*(const bigPosInteger& rhs)
 /*this operator should be able to multiply two bigPosInteger together and return the result. The default return should be replaced with the appropriate variable*/
 {
     bigPosInteger result;
-    int i, j;
-    long long temp, 
+
+    long long temp, carry, large, small, i, j;
+
+    //create a space for the result.
+    result.length =  this->length + rhs.length -1;
+    result.valueArray = new int[result.length];
+
+    //Initialize new object result values to zero
+    for(i=0;i<result.length;i++)
+    {
+        result.valueArray[i]=0;
+    }
+
+    if(this->length > rhs.length)
+    {
+        large = this->length;
+        small = rhs.length;
+    }
+    else
+    {
+        large = rhs.length;
+        small = this->length;
+    }
+
+    for(i=small;i<=small;i--)
+    {
+        for(j=large;i>=large;j--)
+        {
+            temp = rhs.valueArray[i]*this->valueArray[j];
+            if(temp > 10)
+            {
+                temp %= 10;
+                carry =  temp/10;
+                result.valueArray[i+j] += temp+carry;
+                carry=0;
+            }
+            else{
+                result.valueArray[i+j]+= temp;
+            }
+        }
+    }
+
+    return result;
+
 }
 
 bigPosInteger &bigPosInteger::operator=(const bigPosInteger& rhs)
