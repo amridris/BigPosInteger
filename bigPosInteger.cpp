@@ -304,11 +304,31 @@ std::ostream &operator<<(std::ostream & stream, const bigPosInteger& rhs)
 
     }
 
+    return stream;
 
 }
 
 std::istream &operator>>(std::istream &input, bigPosInteger &rhs)
 /* this is the copy assignment operator, be EXTREMELY careful for memory leaks here. The default return should be replaced with the appropriate variable*/
 {
-    
+    //Initializing variables
+    int i;
+    string userIn;
+
+    //save user's input
+    input>>userIn;
+
+    //Check the user's input before extracting for further use
+    for(i=0;i<=userIn.length();i++)
+    {
+        //use the isdigit function to check if input is a decimal or not;
+        if(!isdigit(userIn[i]))
+        {
+            cerr<<"Inacceptable charater was inputted, exiting program"<<endl;
+        }
+    }
+
+    //If the check complete and a number was inputted return it
+    return input;
+
 }
