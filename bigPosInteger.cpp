@@ -294,16 +294,29 @@ bigPosInteger &bigPosInteger::operator=(const bigPosInteger& rhs)
 std::ostream &operator<<(std::ostream & stream, const bigPosInteger& rhs)
 /* this is the copy assignment operator, be EXTREMELY careful for memory leaks here. The default return should be replaced with the appropriate variable*/
 {
+    //Initialize variables
     long long i = rhs.length;
+    int x;
+
+
+    //Loop through to skip the leading zeroes
     for(int x =0; x<=i;x++)
     {
+        //exit the loop if the first number was found
         if(valueArray[i]>0)
         {
-            stream<<rhs.valueArray[i];
+            break;
         }
 
     }
 
+    //continue printing the numbers without skipping any zeroes.
+    for(x; x<=i;x++)
+    {
+        stream << valueArray[i];
+    }
+
+    //return stream
     return stream;
 
 }
@@ -318,17 +331,26 @@ std::istream &operator>>(std::istream &input, bigPosInteger &rhs)
     //save user's input
     input>>userIn;
 
-    //Check the user's input before extracting for further use
-    for(i=0;i<=userIn.length();i++)
+    //Check the user's input before extracting for further use (looping till the '\0' character is encountered.
+    for(i=0;i<=userIn.length()-1;i++)
     {
-        //use the isdigit function to check if input is a decimal or not;
+        //use the isdigit function to check if input is a decimal;
         if(!isdigit(userIn[i]))
         {
             cerr<<"Inacceptable charater was inputted, exiting program"<<endl;
+            exit(1);
         }
     }
 
-    //If the check complete and a number was inputted return it
+
+    //create a new temp object and save the result if all inputs are decimals.
+    bigPosInteger temp(userIn);
+
+    //let rhs be equal to temp
+    rhs=temp;
+
+
+
     return input;
 
 }
