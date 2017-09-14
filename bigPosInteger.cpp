@@ -261,7 +261,8 @@ bigPosInteger &bigPosInteger::operator=(const bigPosInteger& rhs)
     delete[]valueArray;
 
 
-    //shallow copy the length
+
+    //shallow copy the length value
     length = rhs.length;
 
     //deep copying the values to "this" object
