@@ -14,6 +14,7 @@ class bigPosInteger {
     int length;
 
 public:
+    explicit bigPosInteger();
     explicit bigPosInteger(std::string value);
     explicit bigPosInteger(int valArr);
     bigPosInteger(const bigPosInteger& );//copy constructor

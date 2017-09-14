@@ -5,6 +5,10 @@ using namespace std;
 #include "bigPosInteger.h"
 
 
+bigPosInteger::bigPosInteger() {
+    length = 0;
+    valueArray = NULL;
+}
 bigPosInteger::bigPosInteger(std::string value)
 /*This constructor should take in a string containing a set of chars between '0' and '9' of arbitrary length and constructs it into bigPosInteger type*/
 {
@@ -290,11 +294,21 @@ bigPosInteger &bigPosInteger::operator=(const bigPosInteger& rhs)
 std::ostream &operator<<(std::ostream & stream, const bigPosInteger& rhs)
 /* this is the copy assignment operator, be EXTREMELY careful for memory leaks here. The default return should be replaced with the appropriate variable*/
 {
-    return <#initializer#>;
+    long long i = rhs.length;
+    for(int x =0; x<=i;x++)
+    {
+        if(valueArray[i]>0)
+        {
+            stream<<rhs.valueArray[i];
+        }
+
+    }
+
+
 }
 
-std::istream &operator>>(std::istream &, bigPosInteger &)
+std::istream &operator>>(std::istream &input, bigPosInteger &rhs)
 /* this is the copy assignment operator, be EXTREMELY careful for memory leaks here. The default return should be replaced with the appropriate variable*/
 {
-    return <#initializer#>;
+    
 }
