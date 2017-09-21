@@ -9,9 +9,11 @@
 #include <string>
 #include <stdlib.h>
 
+
+
 class bigPosInteger {
     int * valueArray;
-    int length;
+    long long length;
 
 public:
     explicit bigPosInteger();

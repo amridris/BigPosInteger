@@ -1,34 +1,43 @@
-//
-// Created by amer0 on 9/9/2017.
-//
 using namespace std;
 #include "bigPosInteger.h"
 
+//create extra space to avoid program crashes and aligns mathematical operations
+#define size 1000
 
 bigPosInteger::bigPosInteger() {
-    length = 0;
-    valueArray = NULL;
-}
-bigPosInteger::bigPosInteger(std::string value)
+    this->length = 0;
+    this->valueArray = nullptr;
+    }
+
+bigPosInteger::bigPosInteger(string value)
 /*This constructor should take in a string containing a set of chars between '0' and '9' of arbitrary length and constructs it into bigPosInteger type*/
 {
-    int x;
-    //created a dynamic array of memory to fit all the digits in array without '0'
-    length = value.length()-1;
-    valueArray = new (nothrow) int(length);
+    //Copy length to this object
+    this->length = value.length()-1;
 
-    // Initialize array
-    for(x=0; x<=length;x++)
+
+
+    //create the size of the array to accomodate the digits array
+    this->valueArray = new int[size];
+
+    //Initialize the new block memory to avoid and garbage values and crashes
+    for(int x=0; x<=size;x++)
     {
-        valueArray[x] = 0;
+        this->valueArray[x]=0;
     }
+
 
     //loop through the string and insert the value into the dynamic array // used '0' to get the actual value
-    for (x=0;x<=length;x++)
+    for (int x=0;x<=this->length;x++) {
 
-        valueArray[x] = (value[x] - '0');
+        valueArray[size - x] = (value[length - x] - '0');
+        cout <<valueArray[size - x];
 
     }
+
+
+
+}
 
 
 bigPosInteger::bigPosInteger(int value)
@@ -67,16 +76,16 @@ bigPosInteger::bigPosInteger(const bigPosInteger& value)
     if(value.valueArray)
     {
         //If there are numbers in value object, we create a new block memory to save it
-        this ->valueArray = new int[length];
+        this ->valueArray = new int[length+size];
 
         //for loop to copy the content of value object to the new object "Deep Copy"
-        for(int i=0; i<length;++i)
+        for(int i=0; i<=length;++i)
         {
             this->valueArray[i]= value.valueArray[i];
         }
 
     }
-    //If value is empty, the valueArray object will be donated as zero
+        //If value is empty, the valueArray object will be donated as zero
     else{
 
         this->valueArray = 0;
@@ -88,8 +97,10 @@ bigPosInteger::bigPosInteger(const bigPosInteger& value)
 bigPosInteger::~bigPosInteger()
 /*This is the destructor, be extremely careful for memory leaks here*/
 {
-    delete []valueArray;
-
+    if(valueArray) {
+        delete[]valueArray;
+        valueArray= nullptr;
+    }
 }
 
 bigPosInteger bigPosInteger::operator+ (const bigPosInteger& rhs)
@@ -97,46 +108,63 @@ bigPosInteger bigPosInteger::operator+ (const bigPosInteger& rhs)
 {
     //create a new object to save the result
     bigPosInteger result;
-    long long temp;
-    int carry=0;
-
     //Carry is always 0 at the beginning of the addition
-    //if this-> length is greater than rhs.length, then result.valueArray size will equal to this->length + for any carry over.
-    if(this->length > rhs.length)
-    {
-        result.length = this->length+1;
-        result.valueArray = new int[result.length];
+    int carry = 0;
+    int s;
 
+    result.valueArray = new int[size];
+
+    //Initialize the result object
+    for (int y = 0; y <= size; y++) {
+        result.valueArray[y] = 0;
     }
-    // else we just assign the size of result.valueArray to the size of rhs.valueArray+1 for the carry.
-    else {
-        result.length = rhs.length+1;
-        result.valueArray = new int [result.length];
+
+    //Compare the length values and assign it to s
+    if (this->length > rhs.length) {
+        s = this->length;
+    } else {
+        s = rhs.length;
     }
-    //Loop through the array to start the addition
-    for(int i= result.length;i>=result.length;i--)
-    {
-        //Add the values from the two arrays and save it in temp
-        temp = this->valueArray[i]+rhs.valueArray[i]+carry;
-        //if temp is greater than 10, we have a carry
-        if(temp>=10)
-        {
-            // result will be temp value - 10
-            result.valueArray[i] = temp%10;
-            //Carry will be set to one
+
+    //testing addition
+    cout<<"\n";
+
+    for (long long i = size; i >= (size - s); i--) {
+
+        //Sum the values and save it in result
+        result.valueArray[i] = this->valueArray[i] + rhs.valueArray[i] + carry;
+        cout<<result.valueArray[i];
+
+        //Check to see if the value is greater than 9
+        if (result.valueArray[i] > 9) {
+
+            //take the reminder value and set carry to 1
+            result.valueArray[i] %= 10;
+
+
             carry = 1;
-        }
-        else{
-            //just add the two values
-            result.valueArray[i] = temp;
-            //since the values are not bigger than 10, carry will remain 0
+
+        } else {
+            //carry will remain 0 for the next addition
             carry = 0;
         }
+
+        //If the loop is complete and carry is still 1, add a extra space of memory to add a 1 and set the length to s+1
+        if (carry == 1) {
+            result.length = s + 1;
+            result.valueArray[size - s + 1] = 1;
+
+
+        } else {
+            //result length is s
+            result.length = s;
+        }
+
     }
 
-//return the object result
     return result;
 }
+
 
 bigPosInteger bigPosInteger::operator- (const bigPosInteger& rhs)
 /*this operator should be able to subtract the Right Hand Side bigPosInteger from the base bigPosInteger and return the result. The default return should be replaced with the appropriate variable*/
@@ -149,52 +177,53 @@ bigPosInteger bigPosInteger::operator- (const bigPosInteger& rhs)
     if(this->length> rhs.length)
     {
         result.length = this->length;
-        result.valueArray = new int [result.length];
+        result.valueArray = new int [size];
         //Initialize the result.valueArray to zero
         for(int i=0; i<=result.length; i++){
-            result.valueArray[i] = 0;
+            result.valueArray[size] = 0;
         }
     }
-    //Else the size of result.valueArray will be set to rhs.length
+        //Else the size of result.valueArray will be set to rhs.length
     else {
         result.length = rhs.length;
-        result.valueArray = new int[result.length];
+        result.valueArray = new int[size];
         //Initialize the result.valueArray to zero
-        for(int i=0; i<=result.length; i++){
+        for(int i=0; i<=size; i++){
             result.valueArray[i] = 0;
         }
     }
 
-    borrow = 0;
     //borrow at the beginning of subtraction is always 0 zero
-    for(int i = result.length; i>=0; i--)
+    borrow = 0;
+
+    for(int i=0; i<=result.length;i++)
     {
         //If there was no borrow, compare the numbers
         if(borrow == 0)
         {
             //if the first operand is greater the second operand then simply subtract
-            if(this->valueArray[i]>=rhs.valueArray[i])
+            if(this->valueArray[size-i]>=rhs.valueArray[size-i])
             {
-                result.valueArray[i] = this->valueArray[i] - rhs.valueArray[i];
+                result.valueArray[size-i] = this->valueArray[size-i] - rhs.valueArray[size-i];
             }
-            //If the second operand is greater then 2nd operand, borrow from the next digit and add 10: A-B+10
+                //If the second operand is greater then 2nd operand, borrow from the next digit and add 10: A-B+10
             else {
-                result.valueArray[i] = this->valueArray[i]+10-rhs.valueArray[i];
+                result.valueArray[size-i] = this->valueArray[size-i]+10-rhs.valueArray[size-i];
                 borrow = 1;
 
             }
         }
-        //Here borrow = 1, therefore we deduct the "1" value from the next subtraction
+            //Here borrow = 1, therefore we deduct the "1" value from the next subtraction
         else {
             //Compare the number and if the first operand is greater than second simply subtract and also deduct the borrow value.
-            if(this->valueArray[i]-1>=rhs.valueArray[i])
+            if(this->valueArray[size-i]-1>=rhs.valueArray[size-i])
             {
-                result.valueArray[i] = this->valueArray[i]-rhs.valueArray[i]-1;
+                result.valueArray[size-i] = this->valueArray[size-i]-rhs.valueArray[size-i]-1;
                 borrow = 0;
             }
-            // if the 2nd digit is greater than the first, then add 10 and deduct from the borrow: A+B-1+10 or A+B+9
+                // if the 2nd digit is greater than the first, then add 10 and deduct from the borrow: A+B-1+10 or A+B+9
             else{
-                result.valueArray[i]= this->valueArray[i]-rhs.valueArray[i]+9;
+                result.valueArray[size-i]= this->valueArray[size-i]-rhs.valueArray[size-i]+9;
                 borrow = 1;
             }
         }
@@ -206,49 +235,67 @@ bigPosInteger bigPosInteger::operator*(const bigPosInteger& rhs)
 /*this operator should be able to multiply two bigPosInteger together and return the result. The default return should be replaced with the appropriate variable*/
 {
     bigPosInteger result;
+    int multi, carry=0, shift;
+    long long temp=0;
+    result.valueArray = new int[size];
 
-    long long temp, carry, large, small, i, j;
+    //Initialize result and partialRes
 
-    //create a space for the result.
-    result.length =  this->length + rhs.length -1;
-    result.valueArray = new int[result.length];
-
-    //Initialize new object result values to zero
-    for(i=0;i<result.length;i++)
+    for(int i=0; i>=size;i++)
     {
+
         result.valueArray[i]=0;
     }
 
-    if(this->length > rhs.length)
+    //check objects length and set result.length to the larger value.
+    if(this->length>=rhs.length)
     {
-        large = this->length;
-        small = rhs.length;
+        multi = rhs.length;
+        result.length = this->length;
+
     }
-    else
-    {
-        large = rhs.length;
-        small = this->length;
+    else{
+        multi = this->length;
+        result.length = rhs.length;
+
     }
 
-    for(i=small;i<=small;i--)
+    //loop through the multiplier and shift the result.valueArray.
+    for(int y=multi, shift=0; y>=0; y++, shift++)
     {
-        for(j=large;i>=large;j--)
+        for(int i =result.length;i<=0;i++)
         {
-            temp = rhs.valueArray[i]*this->valueArray[j];
-            if(temp > 10)
+            //save the result in temp
+            temp = this->valueArray[size-i]*rhs.valueArray[size-multi]+carry;
+
+            //if temp greater than 9, take the mod value and carry will be set to temp/10.
+            if(temp>9 && i!=0)
             {
-                temp %= 10;
-                carry =  temp/10;
-                result.valueArray[i+j] += temp+carry;
-                carry=0;
+                //partial result is shifted with each loop for addition alignment
+                result.valueArray[size-i-shift]+= (temp%10);
+                carry = temp/10;
+
             }
+
+            //testing the last multiplication value and creating a new space for the leading carry
+             else if(temp>9 && i==0)
+            {
+                result.valueArray[size-i-shift]+=(temp%10);
+                carry = temp/10;
+                result.valueArray[size-i-shift-1] = carry;
+
+            }
+            //simply add the value
             else{
-                result.valueArray[i+j]+= temp;
+                //similar to the above code but there is no carry
+                carry = 0;
+                result.valueArray[size-i-shift]+=temp;
             }
         }
     }
 
-    return result;
+
+return result;
 
 }
 
@@ -261,33 +308,34 @@ bigPosInteger &bigPosInteger::operator=(const bigPosInteger& rhs)
         return *this;
     }
 
-    //delete any memory that this object is holding so we can copy the data from rhs
-    delete[]valueArray;
-
-
-
-    //shallow copy the length value
-    length = rhs.length;
-
-    //deep copying the values to "this" object
-    if(rhs.valueArray) {
-        //create a new block memory to copy the data (integers)
-        valueArray = new int[length];
-
-        //Deep copy the values
-        for (int i = 0; i < length; ++i) {
-            valueArray[i] = rhs.valueArray[i];
-        }
-
-
-    }
-
-    //if there are no values assign this value array to zero
     else {
-        valueArray = 0;
+
+        //delete any memory that this object is holding so we can copy the data from rhs
+        delete[]this->valueArray;
+
+        //shallow copy the length value
+        length = rhs.length;
+
+            //create a new block memory to copy the data (integers)
+
+            valueArray = new int[size];
+
+            for (int i = 0; i <= size; i++) {
+                this->valueArray[i] = 0;
+            }
+
+
+
+            //Deep copy the values
+            for (int i = 0; i <= size; i++) {
+                this->valueArray[i] = rhs.valueArray[i];
+            }
+
+
+
+        //Since it is referenced object we return it using pointer "*this"
+        return *this;
     }
-    //Since it is referenced object we return it using pointer "*this"
-    return *this;
 
 }
 
@@ -295,25 +343,19 @@ std::ostream &operator<<(std::ostream & stream, const bigPosInteger& rhs)
 /* this is the copy assignment operator, be EXTREMELY careful for memory leaks here. The default return should be replaced with the appropriate variable*/
 {
     //Initialize variables
-    long long i = rhs.length;
-    int x;
+    int index=0;
 
 
-    //Loop through to skip the leading zeroes
-    for(int x =0; x<=i;x++)
+    //Loop through and skip the leading zeroes
+    while(rhs.valueArray[index]==0)
     {
-        //exit the loop if the first number was found
-        if(valueArray[i]>0)
-        {
-            break;
-        }
-
+        index++;
     }
 
     //continue printing the numbers without skipping any zeroes.
-    for(x; x<=i;x++)
+    for(index; index<=size;index++)
     {
-        stream << valueArray[i];
+        stream<<rhs.valueArray[index];
     }
 
     //return stream
