@@ -25,6 +25,7 @@ public:
     bigPosInteger operator+(const bigPosInteger&);
     bigPosInteger operator-(const bigPosInteger&);
     bigPosInteger operator*(const bigPosInteger&);
+    bigPosInteger operator%(const bigPosInteger&);
     bigPosInteger& operator=(const bigPosInteger&);
     friend std::ostream& operator<< (std::ostream&, const bigPosInteger&);
     friend std::istream& operator>> (std::istream&, bigPosInteger&);

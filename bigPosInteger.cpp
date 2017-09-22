@@ -2,7 +2,7 @@ using namespace std;
 #include "bigPosInteger.h"
 
 //create extra space to avoid program crashes and aligns mathematical operations
-#define size 1000
+#define size 10000
 
 bigPosInteger::bigPosInteger() {
     this->length = 0;
@@ -15,9 +15,7 @@ bigPosInteger::bigPosInteger(string value)
     //Copy length to this object
     this->length = value.length()-1;
 
-
-
-    //create the size of the array to accomodate the digits array
+    //create the size of the array to accommodate the digits array
     this->valueArray = new int[size];
 
     //Initialize the new block memory to avoid and garbage values and crashes
@@ -31,12 +29,7 @@ bigPosInteger::bigPosInteger(string value)
     for (int x=0;x<=this->length;x++) {
 
         valueArray[size - x] = (value[length - x] - '0');
-        cout <<valueArray[size - x];
-
     }
-
-
-
 }
 
 
@@ -99,7 +92,7 @@ bigPosInteger::~bigPosInteger()
 {
     if(valueArray) {
         delete[]valueArray;
-        valueArray= nullptr;
+        valueArray = nullptr;
     }
 }
 
@@ -126,14 +119,11 @@ bigPosInteger bigPosInteger::operator+ (const bigPosInteger& rhs)
         s = rhs.length;
     }
 
-    //testing addition
-    cout<<"\n";
 
     for (long long i = size; i >= (size - s); i--) {
 
         //Sum the values and save it in result
         result.valueArray[i] = this->valueArray[i] + rhs.valueArray[i] + carry;
-        cout<<result.valueArray[i];
 
         //Check to see if the value is greater than 9
         if (result.valueArray[i] > 9) {
@@ -173,24 +163,23 @@ bigPosInteger bigPosInteger::operator- (const bigPosInteger& rhs)
     long long temp;
     int borrow;
 
+    //create a new memory block for result
+    result.valueArray= new int[size];
+
+    for(int i=0; i<=size;i++){
+        //Initialize the result.valueArray to zero
+        result.valueArray[i]=0;
+    }
+
+
     //if this->length is greater than rhs.length, result.valueArray size will be equal to this->length.
     if(this->length> rhs.length)
     {
         result.length = this->length;
-        result.valueArray = new int [size];
-        //Initialize the result.valueArray to zero
-        for(int i=0; i<=result.length; i++){
-            result.valueArray[size] = 0;
-        }
     }
         //Else the size of result.valueArray will be set to rhs.length
     else {
         result.length = rhs.length;
-        result.valueArray = new int[size];
-        //Initialize the result.valueArray to zero
-        for(int i=0; i<=size; i++){
-            result.valueArray[i] = 0;
-        }
     }
 
     //borrow at the beginning of subtraction is always 0 zero
@@ -235,65 +224,128 @@ bigPosInteger bigPosInteger::operator*(const bigPosInteger& rhs)
 /*this operator should be able to multiply two bigPosInteger together and return the result. The default return should be replaced with the appropriate variable*/
 {
     bigPosInteger result;
-    int multi, carry=0, shift;
-    long long temp=0;
+    int multi, carry=0, i, carry_add=0;
+    long long temp=0, temp_add=0;
     result.valueArray = new int[size];
 
-    //Initialize result and partialRes
-
-    for(int i=0; i>=size;i++)
+    //Initialize result
+    for(i=0; i<=size;i++)
     {
-
-        result.valueArray[i]=0;
+        result.valueArray[i] = 0;
     }
 
     //check objects length and set result.length to the larger value.
-    if(this->length>=rhs.length)
-    {
+    if(this->length>=rhs.length) {
         multi = rhs.length;
         result.length = this->length;
 
-    }
-    else{
-        multi = this->length;
-        result.length = rhs.length;
+        for (int y = 0, shift = 0; y <= multi; y++, shift++) {
 
-    }
+            for (int i = 0; i <= result.length; i++) {
 
-    //loop through the multiplier and shift the result.valueArray.
-    for(int y=multi, shift=0; y>=0; y++, shift++)
-    {
-        for(int i =result.length;i<=0;i++)
-        {
-            //save the result in temp
-            temp = this->valueArray[size-i]*rhs.valueArray[size-multi]+carry;
+                //save the result in temp
+                temp = (this->valueArray[size - i] * rhs.valueArray[size - y]) + carry;
 
-            //if temp greater than 9, take the mod value and carry will be set to temp/10.
-            if(temp>9 && i!=0)
-            {
-                //partial result is shifted with each loop for addition alignment
-                result.valueArray[size-i-shift]+= (temp%10);
-                carry = temp/10;
+
+                //if temp greater than 9, take the mod value and carry will be set to temp/10.
+                if (temp > 9 && i < result.length) {
+                    //result is shifted with each loop for addition alignment
+                    result.valueArray[size - i - shift] += (temp % 10);
+                    carry = temp / 10;
+
+                }
+
+                    //testing the last multiplication value and creating a new space for the leading carry
+                else if (temp > 9 && i == result.length) {
+                    result.valueArray[size - i - shift] += (temp % 10);
+                    carry = temp / 10;
+                    result.valueArray[size - i - shift - 1] = carry;
+                    carry = 0;
+
+                }
+                    //simply add the value
+                else {
+                    //similar to the above code but there is no carry
+                    carry = 0;
+                    result.valueArray[size - i - shift] += temp;
+                }
 
             }
+        }
 
-            //testing the last multiplication value and creating a new space for the leading carry
-             else if(temp>9 && i==0)
-            {
-                result.valueArray[size-i-shift]+=(temp%10);
-                carry = temp/10;
-                result.valueArray[size-i-shift-1] = carry;
+        for (int z = 1; z <= size; z++) {
+            result.valueArray[size - z] = result.valueArray[size - z] + carry_add;
 
-            }
-            //simply add the value
-            else{
-                //similar to the above code but there is no carry
-                carry = 0;
-                result.valueArray[size-i-shift]+=temp;
+            if (result.valueArray[size - z] > 9) {
+                carry_add = result.valueArray[size - z] / 10;
+                result.valueArray[size - z] = result.valueArray[size - z] % 10;
+
+            } else {
+                carry_add = 0;
             }
         }
     }
 
+
+
+
+
+
+
+    else {
+        multi = this->length;
+        result.length = rhs.length;
+
+        for (int y = 0, shift = 0; y <= multi; y++, shift++) {
+
+            for (int i = 0; i <=result.length; i++) {
+
+                //save the result in temp
+                temp = (this->valueArray[size -y] * rhs.valueArray[size - i]) + carry;
+
+
+                //if temp greater than 9, take the mod value and carry will be set to temp/10.
+                if (temp > 9 && i < result.length) {
+                    //result is shifted with each loop for addition alignment
+                    result.valueArray[size - i - shift] += (temp % 10);
+                    carry = temp / 10;
+
+
+                }
+
+                    //testing the last multiplication value and creating a new space for the leading carry
+                else if (temp > 9 && i == result.length) {
+                    result.valueArray[size - i - shift] += (temp % 10);
+                    carry = temp / 10;
+                    result.valueArray[size - i - shift - 1] = carry;
+                    carry=0;
+
+                }
+                    //simply add the value
+                else {
+                    //similar to the above code but there is no carry
+                    carry = 0;
+                    result.valueArray[size - i - shift] += temp;
+                }
+
+            }
+        }
+
+
+        for (int z = 1; z <= (result.length+1); z++) {
+
+            result.valueArray[size - z] = result.valueArray[size - z] + carry_add;
+
+            if (result.valueArray[size - z] > 9) {
+                carry_add = result.valueArray[size - z] / 10;
+                result.valueArray[size - z] = result.valueArray[size - z] % 10;
+
+            } else {
+                carry_add = 0;
+            }
+        }
+
+    }
 
 return result;
 
@@ -371,15 +423,13 @@ std::istream &operator>>(std::istream &input, bigPosInteger &rhs)
     string userIn;
 
     //save user's input
-    input>>userIn;
+    input >> userIn;
 
     //Check the user's input before extracting for further use (looping till the '\0' character is encountered.
-    for(i=0;i<=userIn.length()-1;i++)
-    {
+    for (i = 0; i <= userIn.length() - 1; i++) {
         //use the isdigit function to check if input is a decimal;
-        if(!isdigit(userIn[i]))
-        {
-            cerr<<"Inacceptable charater was inputted, exiting program"<<endl;
+        if (!isdigit(userIn[i])) {
+            cerr << "Inacceptable charater was inputted, exiting program" << endl;
             exit(1);
         }
     }
@@ -389,10 +439,63 @@ std::istream &operator>>(std::istream &input, bigPosInteger &rhs)
     bigPosInteger temp(userIn);
 
     //let rhs be equal to temp
-    rhs=temp;
-
+    rhs = temp;
 
 
     return input;
+
+}
+
+bigPosInteger bigPosInteger::operator%(const bigPosInteger &rhs) {
+
+    bigPosInteger partialRes;
+    bigPosInteger result;
+    long long temp_val[200], temp_val2[200];
+    long long length2;
+
+    partialRes.valueArray = new int [size];
+    for(int i=0; i<=50;i++)
+    {
+        temp_val[i] = 0;
+    }
+
+    for(int i=0; i<=size;i++)
+    {
+        partialRes.valueArray[i] = 0;
+    }
+
+
+    if(this->length>rhs.length)
+    {
+        partialRes.length = this->length;
+        length2 = rhs.length;
+
+    }
+
+    else{
+        partialRes.length = rhs.length;
+        length2 = rhs.length;
+    }
+
+    for(int i=0; i<=length2;i++)
+    for(int i=0;i<=partialRes.length;i++)
+    {
+        partialRes.valueArray[size-i]= this->valueArray[size-i];
+        temp_val[size-i] = partialRes.valueArray[size-i]*10^i;
+    }
+
+
+    for(int i=0; i<=length2;i++)
+    {
+        temp_val2[size-i] = rhs.valueArray[size-i]*10^i;
+
+    }
+
+    for(int i=0; i<=partialRes.length; i++)
+    {
+        result.valueArray[size-i] = temp_val[size-i]/temp_val2[size-i];
+    }
+
+    return result;
 
 }
